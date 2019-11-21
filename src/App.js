@@ -1,13 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 
 function App() {
-  const [techs, setTech] = useState(['ReactJS', 'React Native']);
+  const [techs, setTech] = useState([]);
   const [newTech, setNewTech] = useState('');
 
-  function handleAdd() {
+  const handleAdd = useCallback(() => {
     setTech([...techs, newTech]);
     setNewTech('');
-  }
+  }, [newTech, techs]);
+
+  useEffect(() => {
+    const storageTechs = localStorage.getItem('techs');
+
+    if (storageTechs) {
+      setTech(JSON.parse(storageTechs));
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('techs', JSON.stringify(techs));
+  }, [techs]);
+
+  const techsSize = useMemo(() => techs.length, [techs]);
 
   return (
     <>
@@ -16,6 +30,8 @@ function App() {
           <li key={tech}>{tech}</li>
         ))}
       </ul>
+      <strong>Você tem {techsSize} tecnologias</strong>
+      <br />
       <input value={newTech} onChange={e => setNewTech(e.target.value)} />
       <button type="button" onClick={handleAdd}>
         Adicionar
